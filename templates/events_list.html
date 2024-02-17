@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <h1 class="mb-4">Events List</h1>
+
+            <table id="eventsTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                        <tr>
+                            <td><a href="{% url 'view_event' event.id %}">{{ event.name }}</a></td>
+                            <td>{{ event.description }}</td>
+                            <td>{{ event.start_date }}</td>
+                            <td>{{ event.end_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <a href="{% url 'add_event' %}" class="btn btn-primary">Add Event</a>
+            <a href="{% url 'index' %}" class="btn btn-secondary">Go to Volunteers List</a>
+        </div>
+    </div>
+</div>
+
+    <script>
+    $(document).ready( function () {
+        $('#eventsTable').DataTable();
+    } );
+    </script>
+
+{% endblock %}
