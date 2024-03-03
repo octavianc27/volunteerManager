@@ -2,11 +2,13 @@ from django.urls import path
 
 from . import views
 from .views import add_volunteer, view_volunteer, events_list, view_event, add_event, delete_event, add_participation, \
-    edit_volunteer, edit_event, generate_report
+    edit_volunteer, edit_event, generate_report, view_dashboard, volunteers_list
 
 urlpatterns = [
-    path("", views.index, name="index"),
-    path('add', add_volunteer, name='add_volunteer'),
+    path("", view_dashboard, name="index"),
+    path('dashboard', view_dashboard, name='view_dashboard'),
+    path('volunteers', volunteers_list, name="volunteers_list"),
+    path('add_volunteer', add_volunteer, name='add_volunteer'),
     path('view_volunteer/<int:user_id>/', view_volunteer, name='view_volunteer'),
     path('edit_volunteer/<int:user_id>/', edit_volunteer, name='edit_volunteer'),
 

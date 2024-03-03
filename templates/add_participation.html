@@ -28,10 +28,27 @@
                 {% endfor %}
 
                 <button type="submit" class="btn btn-primary">Submit</button>
-                <a href="{% url 'index' %}" class="btn btn-secondary">Back</a>
+                <a href="{% url 'volunteers_list' %}" class="btn btn-secondary">Back</a>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+  // Initialize Select2 on the fields with the "select2" class
+  $('.select2').select2();
+});
+</script>
+
+<script>
+$(document).ready(function() {
+  // Initialize datepicker on the fields with the "datepicker" class
+  $('.datepicker').datepicker({
+      format: 'yyyy-mm-dd', // You can adjust the format according to your needs
+      autoclose: true,
+  });
+});
+</script>
 
 {% endblock %}

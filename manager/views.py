@@ -1,4 +1,8 @@
 # views.py
+import base64
+import calendar
+import json
+from datetime import datetime, timedelta
 from io import BytesIO
 
 from django.contrib.auth.decorators import login_required
@@ -12,16 +16,19 @@ from .models import Volunteer, Event, Participation
 
 from reportlab.pdfgen import canvas
 
+import matplotlib.pyplot as plt
+from collections import Counter
+
 
 @login_required
-def index(request):
+def volunteers_list(request):
     volunteers = Volunteer.objects.all()
 
     for volunteer in volunteers:
         volunteer.total_hours = Participation.objects.filter(volunteer=volunteer).aggregate(Sum('worked_hours'))[
                                     'worked_hours__sum'] or 0
 
-    return render(request, 'index.html', {'volunteers': volunteers})
+    return render(request, 'volunteers_list.html', {'volunteers': volunteers})
 
 
 @login_required
@@ -30,7 +37,7 @@ def add_volunteer(request):
         form = VolunteerForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('/manager')  # Redirect to a page displaying the list of volunteers
+            return redirect('/')  # Redirect to a page displaying the list of volunteers
     else:
         form = VolunteerForm()
 
@@ -142,7 +149,6 @@ def edit_event(request, event_id):
     return render(request, 'edit_event.html', {'form': form, 'event': event})
 
 
-
 @login_required
 def generate_report(request, user_id):
     volunteer = get_object_or_404(Volunteer, pk=user_id)
@@ -161,7 +167,7 @@ def generate_report(request, user_id):
     p.setFont("Helvetica-Bold", 12)
     # Add an image as a header (replace 'your_image_path.png' with the actual image path)
     image_path = 'static/images/logo_asf.png'
-    p.drawImage(image_path, 50, 700, width=140, height=50, mask="auto")
+    p.drawImage(image_path, 50, 700, width=60, height=60, mask="auto")
 
     # Draw the volunteer's name on the PDF
     name_text = f"Volunteer Name: {volunteer.first_name} {volunteer.last_name}"
@@ -176,7 +182,12 @@ def generate_report(request, user_id):
     y_position = 580  # Starting Y position for participations
 
     for participation in participations:
-        participation_text = f"Event: {participation.event.name} | Date: {participation.date} | Worked Hours: {participation.worked_hours} hours"
+        if participation.event.start_date != participation.event.end_date:
+            date_range = f"{participation.event.start_date} - {participation.event.end_date}"
+        else:
+            date_range = str(participation.event.start_date)
+
+        participation_text = f"Event: {participation.event.name} | Date: {date_range} | Worked Hours: {participation.worked_hours} hours"
         p.drawString(100, y_position, participation_text)
 
         # Handle longer notes by manually wrapping text
@@ -204,7 +215,6 @@ def generate_report(request, user_id):
 
     # Add other PDF content as needed, e.g., total hours, etc.
     p.drawString(100, y_position - 20, f"Total Hours: {total_hours} hours")
-    # ... add more content as needed
 
     # Close the PDF object cleanly, and we're done.
     p.showPage()
@@ -217,3 +227,83 @@ def generate_report(request, user_id):
     response[
         'Content-Disposition'] = f'attachment; filename="{volunteer.first_name}_{volunteer.last_name}_report.pdf"'
     return response
+
+
+@login_required()
+def view_dashboard(request):
+    # Retrieve counts of volunteers, active volunteers, and total events
+    num_volunteers = Volunteer.objects.filter(is_member=True).count()
+    num_active_volunteers = Volunteer.objects.filter(is_active_member=True).count()
+    num_events = Event.objects.count()
+
+    # Retrieve upcoming events within the next 30 days
+    today = datetime.now().date()
+    thirty_days_later = today + timedelta(days=30)
+    upcoming_events = Event.objects.filter(start_date__range=[today, thirty_days_later]).order_by("start_date")
+
+    # Calculate worked hours per month in the last year and create a bar chart
+    today = datetime.now().date()
+    last_year = today - timedelta(days=365)
+    monthly_worked_hours = Participation.objects.filter(
+        event__start_date__gte=last_year,
+        event__start_date__lte=today
+    ).values('event__start_date__month').order_by('event__start_date__month').annotate(total_hours=Sum('worked_hours'))
+
+    # Extract data for monthly totals and create a bar chart
+    monthly_totals_dict = {result['event__start_date__month']: result['total_hours'] for result in monthly_worked_hours}
+    current_month = today.month
+    ordered_months = [(current_month + i - 1) % 12 + 1 for i in range(1, 13)]
+    month_names = [calendar.month_abbr[month] for month in ordered_months]
+    monthly_totals = [monthly_totals_dict.get(month, 0) for month in ordered_months]
+
+    # Generate a bar chart image and convert it to base64 for rendering in the template
+    plt.figure(figsize=(8, 5))
+    plt.bar(month_names, monthly_totals)
+    plt.xlabel('Month', fontsize=14)
+    plt.ylabel('Total Hours', fontsize=14)
+    plt.title('Volunteering Hours per Month in the Last Year', fontsize=16)
+    image_stream = BytesIO()
+    plt.savefig(image_stream, format='png')
+    plt.close()
+    image_base64 = base64.b64encode(image_stream.getvalue()).decode('utf-8')
+
+    # Retrieve event data for the calendar
+    events = Event.objects.all()
+    events_data = []
+    for event in events:
+        end_date = event.end_date if event.end_date == event.start_date else event.end_date + timedelta(days=1)
+        events_data.append({
+            'title': event.name,
+            'start': event.start_date.isoformat(),
+            'end': end_date.isoformat(),
+        })
+
+    # Get all volunteers by department and create a pie chart
+    departments = Volunteer.objects.values('department')
+    departments = [item['department'] for item in departments]
+    department_counts = Counter(departments)
+
+    plt.figure(figsize=(8, 5))
+    plt.pie(department_counts.values(), labels=department_counts.keys(), autopct='%1.1f%%', textprops={'fontsize': 18})
+    plt.title('Volunteers Distribution by Department', fontsize=16)
+
+    department_chart_stream = BytesIO()
+    plt.savefig(department_chart_stream, format='png')
+    plt.close()
+
+    department_chart_base64 = base64.b64encode(department_chart_stream.getvalue()).decode('utf-8')
+
+    # Prepare the context with relevant data for rendering in the template
+    context = {
+        'num_volunteers': num_volunteers,
+        'num_active_volunteers': num_active_volunteers,
+        'num_events': num_events,
+        'upcoming_events': upcoming_events,
+        'chart_image': image_base64,
+        'department_chart_image': department_chart_base64,
+        'events_calendar': events_data
+    }
+
+    # Render the 'dashboard.html' template with the context data
+    return render(request, 'dashboard.html', context)
+

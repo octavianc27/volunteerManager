@@ -6,8 +6,20 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Submit</button>
+        <div class="button-container">
+            <button class="btn btn-primary" type="submit">Submit</button>
+            <a href="{% url 'events_list' %}" class="btn btn-secondary">Back to Events List</a>
+        </div>
     </form>
-    <a href="{% url 'events_list' %}"><button>Back to Events List</button></a>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize datepicker on the fields with the "datepicker" class
+            $('.datepicker').datepicker({
+                format: 'yyyy-mm-dd', // You can adjust the format according to your needs
+                autoclose: true,
+            });
+        });
+    </script>
 
 {% endblock %}

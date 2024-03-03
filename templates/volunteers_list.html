@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <h1 class="display-4">Volunteers List</h1>
+                <table id="volunteersTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Is Active</th>
+                            <th>Is Member</th>
+                            <th>Last Active Date</th>
+                            <th>Total Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for volunteer in volunteers %}
+                            <tr>
+                                <td><a href="{% url 'view_volunteer' volunteer.id %}">{{ volunteer.first_name }} {{ volunteer.last_name }}</a></td>
+                                <td>{{ volunteer.email }}</td>
+                                <td>{{ volunteer.department }}</td>
+                                <td>{% if volunteer.is_active_member %}Yes{% else %}No{% endif %}</td>
+                                <td>{% if volunteer.is_member %}Yes{% else %}No{% endif %}</td>
+                                <td>{{ volunteer.last_active_date }}</td>
+                                <td>{{ volunteer.total_hours }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <a href="{% url 'add_volunteer' %}"><button class="btn btn-primary">Add Volunteer</button></a>
+                <a href="{% url 'add_participation' %}"><button class="btn btn-primary">Add Participation</button></a>
+                <a href="{% url 'events_list' %}"><button class="btn btn-primary">Go to Events List</button></a>
+
+                <script>
+                    $(document).ready(function () {
+                        var table = $('#volunteersTable').DataTable({
+                            "paging": true,
+                            "ordering": true,
+                            "info": true,
+                            "searching": true,
+                        });
+
+                        // Add dropdown filters
+                        table.columns([2, 3, 4]).every(function () {
+                            var column = this;
+
+                            var select = $('<select><option value=""></option></select>')
+                                .appendTo($(column.header()))
+                                .on('change', function () {
+                                    var val = $.fn.dataTable.util.escapeRegex(
+                                        $(this).val()
+                                    );
+
+                                    column
+                                        .search(val ? '^' + val + '$' : '', true, false)
+                                        .draw();
+                                });
+
+                            column.data().unique().sort().each(function (d, j) {
+                                select.append('<option value="' + d + '">' + d + '</option>')
+                            });
+                        });
+                    });
+                </script>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

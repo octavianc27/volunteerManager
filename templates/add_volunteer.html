@@ -2,38 +2,48 @@
 
 {% block content %}
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h1 class="mb-4">Add Volunteer</h1>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="mb-4">Add Volunteer</h1>
 
-            <form method="post">
-                {% csrf_token %}
+                <form method="post">
+                    {% csrf_token %}
 
-                {{ form.non_field_errors }}
+                    {{ form.non_field_errors }}
 
-                {% for field in form %}
-                    {% if field.name != 'last_active_date' %}
-                        <div class="mb-3">
-                            {{ field.label_tag }}
-                            {{ field }}
-                            {% if field.help_text %}
-                                <small class="form-text text-muted">{{ field.help_text }}</small>
-                            {% endif %}
-                            {% if field.errors %}
-                                <div class="invalid-feedback">
-                                    {{ field.errors|join:", " }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                {% endfor %}
+                    {% for field in form %}
+                        {% if field.name != 'last_active_date' %}
+                            <div class="mb-3">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ field.errors|join:", " }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
 
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <a href="{% url 'index' %}" class="btn btn-secondary">Back</a>
-            </form>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <a href="{% url 'volunteers_list' %}" class="btn btn-secondary">Back</a>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
+    <script>
+        $(document).ready(function () {
+            // Initialize datepicker on the fields with the "datepicker" class
+            $('.datepicker').datepicker({
+                format: 'yyyy-mm-dd', // You can adjust the format according to your needs
+                autoclose: true,
+            });
+        });
+    </script>
+    
 {% endblock %}

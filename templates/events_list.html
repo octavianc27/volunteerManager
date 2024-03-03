@@ -5,7 +5,7 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
-            <h1 class="mb-4">Events List</h1>
+            <h1 class="mb-4 display-4">Events List</h1>
 
             <table id="eventsTable" class="table table-striped">
                 <thead>
@@ -29,14 +29,19 @@
             </table>
 
             <a href="{% url 'add_event' %}" class="btn btn-primary">Add Event</a>
-            <a href="{% url 'index' %}" class="btn btn-secondary">Go to Volunteers List</a>
+            <a href="{% url 'volunteers_list' %}" class="btn btn-secondary">Go to Volunteers List</a>
         </div>
     </div>
 </div>
 
     <script>
     $(document).ready( function () {
-        $('#eventsTable').DataTable();
+        $('#eventsTable').DataTable({
+            "columnDefs": [
+                { "type": "date", "targets": 3 }
+            ],
+            "order": [[3, 'desc']]
+        });
     } );
     </script>
 

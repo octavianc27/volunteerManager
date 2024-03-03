@@ -2,34 +2,51 @@
 
 {% block content %}
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h1 class="mb-4">Event Details</h1>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="mb-4">Event Details</h1>
 
-            <div class="mb-4">
-                <p><strong>Name:</strong> {{ event.name }}</p>
-                <p><strong>Description:</strong> {{ event.description }}</p>
-                <p><strong>Start Date:</strong> {{ event.start_date }}</p>
-                <p><strong>End Date:</strong> {{ event.end_date }}</p>
-                <!-- Display other event details as needed -->
-                <p class="mt-4"><strong>Total Hours:</strong> {{ total_hours }} hours</p>
+                <div class="mb-4">
+                    <p><strong>Name:</strong> {{ event.name }}</p>
+                    <p><strong>Description:</strong> {{ event.description }}</p>
+                    <p><strong>Start Date:</strong> {{ event.start_date }}</p>
+                    <p><strong>End Date:</strong> {{ event.end_date }}</p>
+                    <!-- Display other event details as needed -->
+                    <p class="mt-4"><strong>Total Hours:</strong> {{ total_hours }} hours</p>
+                </div>
+
+                <h2 class="mb-3">Participations</h2>
+
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col">Volunteer Name</th>
+                        <th scope="col">Worked Hours</th>
+                        <th scope="col">Notes</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for participation in participations %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'view_volunteer' user_id=participation.volunteer.id %}">
+                                    {{ participation.volunteer.first_name }} {{ participation.volunteer.last_name }}
+                                </a>
+                            </td>
+                            <td>{{ participation.worked_hours }} hours</td>
+                            <td>{{ participation.notes }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+
+                <a href="{% url 'events_list' %}" class="btn btn-secondary">Back</a>
+                <a href="{% url 'edit_event' event_id=event.id %}" class="btn btn-primary">Edit Event</a>
+                <a href="{% url 'delete_event' event.id %}" class="btn btn-danger">Delete Event</a>
             </div>
-
-            <h2 class="mb-3">Participations</h2>
-            <ul class="list-group mb-3">
-                {% for participation in participations %}
-                    <li class="list-group-item">
-                        {{ participation.volunteer.first_name }} {{ participation.volunteer.last_name }} - {{ participation.date }} - {{ participation.worked_hours }} hours
-                        <!-- Display other participation details as needed -->
-                    </li>
-                {% endfor %}
-            </ul>
-            <a href="{% url 'events_list' %}" class="btn btn-secondary">Back</a>
-            <a href="{% url 'edit_event' event_id=event.id %}" class="btn btn-primary">Edit Event</a>
-            <a href="{% url 'delete_event' event.id %}" class="btn btn-danger">Delete Event</a>
         </div>
     </div>
-</div>
 
 {% endblock %}
