@@ -5,6 +5,7 @@ import json
 from datetime import datetime, timedelta
 from io import BytesIO
 
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Count, Value
 from django.db.models.functions import Coalesce
@@ -256,9 +257,13 @@ def view_dashboard(request):
     # Calculate worked hours per month in the last year and create a bar chart
     today = datetime.now().date()
     last_year = today - timedelta(days=365)
+
+    # Calculate the last day of the current month
+    last_day_of_month = today.replace(day=1) + relativedelta(months=1, days=-1)
+
     monthly_worked_hours = Participation.objects.filter(
         event__start_date__gte=last_year,
-        event__start_date__lte=today
+        event__start_date__lte=last_day_of_month
     ).values('event__start_date__month').order_by('event__start_date__month').annotate(total_hours=Sum('worked_hours'))
 
     # Extract data for monthly totals and create a bar chart
