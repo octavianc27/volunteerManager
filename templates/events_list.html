@@ -2,47 +2,60 @@
 
 {% block content %}
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <h1 class="mb-4 display-4">Events List</h1>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <h1 class="mb-4 display-4">Events List</h1>
 
-            <table id="eventsTable" class="table table-striped">
-                <thead>
+                <table id="eventsTable" class="table table-striped">
+                    <thead>
                     <tr>
                         <th>Name</th>
                         <th>Description</th>
                         <th>Start Date</th>
                         <th>End Date</th>
+                        <th>Total Worked Hours</th>
+                        <th>Total Participants</th>
                     </tr>
-                </thead>
-                <tbody>
+                    </thead>
+                    <tbody>
                     {% for event in events %}
                         <tr>
                             <td><a href="{% url 'view_event' event.id %}">{{ event.name }}</a></td>
-                            <td>{{ event.description }}</td>
+                            <td class="max-width-description">{{ event.description }}</td>
                             <td>{{ event.start_date }}</td>
                             <td>{{ event.end_date }}</td>
+                            <td>{{ event.total_hours }}</td>
+                            <td>{{ event.total_participants }}</td>
                         </tr>
                     {% endfor %}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
 
-            <a href="{% url 'add_event' %}" class="btn btn-primary">Add Event</a>
-            <a href="{% url 'volunteers_list' %}" class="btn btn-secondary">Go to Volunteers List</a>
+                <a href="{% url 'add_event' %}" class="btn btn-primary">Add Event</a>
+                <a href="{% url 'volunteers_list' %}" class="btn btn-secondary">Go to Volunteers List</a>
+            </div>
         </div>
     </div>
-</div>
+
+    <style>
+        .max-width-description {
+            max-width: 300px; /* Adjust the value as needed */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
 
     <script>
-    $(document).ready( function () {
-        $('#eventsTable').DataTable({
-            "columnDefs": [
-                { "type": "date", "targets": 3 }
-            ],
-            "order": [[3, 'desc']]
+        $(document).ready(function () {
+            $('#eventsTable').DataTable({
+                "columnDefs": [
+                    {"type": "date", "targets": 3},
+                    {"type": "num", "targets": [4, 5]} 
+                ],
+                "order": [[3, 'desc']]
+            });
         });
-    } );
     </script>
 
 {% endblock %}

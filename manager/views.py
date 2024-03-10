@@ -6,7 +6,8 @@ from datetime import datetime, timedelta
 from io import BytesIO
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, Count, Value
+from django.db.models.functions import Coalesce
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from reportlab.lib.pagesizes import letter
@@ -67,7 +68,11 @@ def view_volunteer(request, user_id):
 
 @login_required
 def events_list(request):
-    events = Event.objects.all()
+    events = Event.objects.annotate(
+        total_hours=Coalesce(Sum('participation__worked_hours'), Value(0)),
+        total_participants=Count('participation__volunteer', distinct=True)
+    )
+
     return render(request, 'events_list.html', {'events': events})
 
 
@@ -280,6 +285,7 @@ def view_dashboard(request):
     for event in events:
         end_date = event.end_date if event.end_date == event.start_date else event.end_date + timedelta(days=1)
         events_data.append({
+            'id': event.id,
             'title': event.name,
             'start': event.start_date.isoformat(),
             'end': end_date.isoformat(),

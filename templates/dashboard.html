@@ -93,21 +93,21 @@
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 events: [
-                    {% for i in events_calendar %}
+                    {% for event in events_calendar %}
                         {
-                            title: "{{ i.title}}",
-                            start: '{{ i.start}}',
-                            end: '{{ i.end}}',
-
+                            title: "{{ event.title}}",
+                            start: '{{ event.start}}',
+                            end: '{{ event.end}}',
+                            url: '{% url "view_event" event.id %}'
                         },
                     {% endfor %}
-
                 ]
             });
 
 
-            calendar.render();
-        });
+        calendar.render();
+        })
+        ;
 
     </script>
 
