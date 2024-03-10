@@ -109,9 +109,16 @@ def delete_event(request, event_id):
 def add_participation(request):
     if request.method == 'POST':
         form = ParticipationForm(request.POST)
+
         if form.is_valid():
-            participation = form.save()
-            participation.volunteer.update_last_active_date()
+            volunteers = form.cleaned_data["volunteers"]
+
+            for volunteer in volunteers:
+                participation = Participation.objects.create(volunteer=volunteer, event=form.cleaned_data['event'],
+                                                             worked_hours=form.cleaned_data['worked_hours'],
+                                                             notes=form.cleaned_data['notes'])
+                volunteer.update_last_active_date()
+
             return redirect('volunteers_list')
     else:
         form = ParticipationForm()
@@ -306,4 +313,3 @@ def view_dashboard(request):
 
     # Render the 'dashboard.html' template with the context data
     return render(request, 'dashboard.html', context)
-

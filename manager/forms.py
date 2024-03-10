@@ -1,6 +1,7 @@
 # forms.py
 from django import forms
 from .models import Volunteer, Event, Participation
+from django_select2.forms import Select2MultipleWidget
 
 
 class VolunteerForm(forms.ModelForm):
@@ -25,19 +26,24 @@ class EventForm(forms.ModelForm):
 
 
 class ParticipationForm(forms.ModelForm):
+    volunteers = forms.ModelMultipleChoiceField(
+        queryset=Volunteer.objects.order_by("last_name"),
+        widget=Select2MultipleWidget(attrs={'data-maximum-selection-length': 100}),
+        required=False)
+
     class Meta:
         model = Participation
-        fields = '__all__'
+        fields = ['volunteers', 'event', 'worked_hours', 'notes']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Override the queryset for the participant field
-        self.fields['volunteer'].queryset = Volunteer.objects.order_by('last_name')
         self.fields['event'].queryset = Event.objects.order_by('-end_date')
 
         # Make the dropdown searchable
-        self.fields['volunteer'].widget.attrs['class'] = 'select2'
+        self.fields['volunteers'].widget.attrs['class'] = 'select2'
+        self.fields['volunteers'].widget.attrs['multiple'] = 'multiple'
         self.fields['event'].widget.attrs['class'] = 'select2'
 
 
