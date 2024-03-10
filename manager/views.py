@@ -37,7 +37,7 @@ def add_volunteer(request):
         form = VolunteerForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('/')  # Redirect to a page displaying the list of volunteers
+            return redirect('volunteers_list')  # Redirect to a page displaying the list of volunteers
     else:
         form = VolunteerForm()
 
@@ -112,7 +112,7 @@ def add_participation(request):
         if form.is_valid():
             participation = form.save()
             participation.volunteer.update_last_active_date()
-            return redirect('index')
+            return redirect('volunteers_list')
     else:
         form = ParticipationForm()
 
@@ -233,7 +233,7 @@ def generate_report(request, user_id):
 def view_dashboard(request):
     # Retrieve counts of volunteers, active volunteers, and total events
     num_volunteers = Volunteer.objects.filter(is_member=True).count()
-    num_active_volunteers = Volunteer.objects.filter(is_active_member=True).count()
+    num_active_volunteers = Volunteer.objects.filter(is_active_member=True).filter(is_member=True).count()
     num_events = Event.objects.count()
 
     # Retrieve upcoming events within the next 30 days
@@ -279,7 +279,7 @@ def view_dashboard(request):
         })
 
     # Get all volunteers by department and create a pie chart
-    departments = Volunteer.objects.values('department')
+    departments = Volunteer.objects.filter(is_member=True).values('department')
     departments = [item['department'] for item in departments]
     department_counts = Counter(departments)
 
