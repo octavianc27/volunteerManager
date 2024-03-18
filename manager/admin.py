@@ -13,7 +13,8 @@ class VolunteerAdmin(admin.ModelAdmin):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('name', 'start_date', 'end_date')
+    list_display = ('name', 'start_date', 'end_date', "done_reporting")
+    list_filter = ("done_reporting",)
     search_fields = ('name', 'description')
 
 

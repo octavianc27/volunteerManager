@@ -354,7 +354,7 @@ def view_dashboard(request):
     plt.bar(years, counts, color='skyblue')
     plt.xlabel('Year')
     plt.ylabel('Number of Adherences')
-    plt.title('Number of Adherences per Year', fontsize=18)
+    plt.title('Adherence Year of Current Members', fontsize=18)
     plt.xticks(years)
     plt.grid(axis='y', linestyle='--', alpha=0.7)
 

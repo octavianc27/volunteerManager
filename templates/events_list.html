@@ -16,6 +16,7 @@
                         <th>End Date</th>
                         <th>Total Worked Hours</th>
                         <th>Total Participants</th>
+                        <th>Done reporting</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -27,6 +28,14 @@
                             <td>{{ event.end_date }}</td>
                             <td>{{ event.total_hours }}</td>
                             <td>{{ event.total_participants }}</td>
+                            <td>
+                                {% if event.done_reporting %}
+                                    <p class="text-success">Yes</p>
+                                {% else %}
+                                    <span class="text-danger">No</span>
+                                {% endif %}
+                            </td>
+
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -48,14 +57,43 @@
 
     <script>
         $(document).ready(function () {
-            $('#eventsTable').DataTable({
+            var table = $('#eventsTable').DataTable({
+                "paging": true,
+                "ordering": true,
+                "info": true,
+                "searching": true,
                 "columnDefs": [
                     {"type": "date", "targets": 3},
-                    {"type": "num", "targets": [4, 5]} 
+                    {"type": "num", "targets": [4, 5]}
                 ],
                 "order": [[3, 'desc']]
             });
+
+            // Add dropdown filters
+            table.columns([6]).every(function () {
+                var column = this;
+
+                var select = $('<select><option value=""></option></select>')
+                    .appendTo($(column.header()))
+                    .on('change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+
+                        column
+                            .search(val ? '^' + val + '$' : '', true, false)
+                            .draw();
+                    });
+
+                // Extract text content of cells, excluding any HTML tags
+                column.data().unique().sort().each(function (d, j) {
+                    var text = $('<div>').html(d).text(); // Extract text content
+                    select.append('<option value="' + text + '">' + text + '</option>');
+                });
+            });
         });
+
     </script>
+
 
 {% endblock %}
