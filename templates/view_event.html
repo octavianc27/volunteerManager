@@ -37,8 +37,25 @@
                             </td>
                             <td>{{ participation.worked_hours }} hours</td>
                             <td>{{ participation.notes }}</td>
-                            <td><a href="{% url 'edit_participation' participation_id=participation.id %}"
-                                   class="btn btn-primary">Edit Participation</a></td>
+                            <td>
+                                <div class="row justify-content-center">
+                                    <div class="col-auto">
+                                        <a href="{% url 'edit_participation' participation_id=participation.id %}"
+                                           class="btn btn-primary">Edit Participation</a>
+                                    </div>
+                                    <div class="col-auto">
+                                        <form method="post" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="delete_participation"
+                                                   value="{{ participation.id }}">
+                                            <button type="submit" name="delete_participation_button"
+                                                    class="btn btn-danger">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>

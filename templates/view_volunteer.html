@@ -3,94 +3,115 @@
 {% block content %}
 
     <div class="container mt-3">
-        <h1 class="mb-4">User Details</h1>
+        <div class="col-md-14">
+            <h1 class="mb-4">User Details</h1>
 
-        <div class="row">
-            <div class="col-md-6">
-                <p><strong>Name:</strong> {{ volunteer.first_name }} {{ volunteer.last_name }}</p>
-                <p><strong>Email:</strong> {{ volunteer.email }}</p>
-                <p><strong>Phone Number:</strong> {{ volunteer.phone_number }}</p>
-                <p><strong>Education Level:</strong> {{ volunteer.get_education_level_display }}</p>
-                <p><strong>Education Year:</strong> {{ volunteer.education_year }}</p>
-                <p><strong>Department:</strong> {{ volunteer.department }}</p>
-            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Name:</strong> {{ volunteer.first_name }} {{ volunteer.last_name }}</p>
+                    <p><strong>Email:</strong> {{ volunteer.email }}</p>
+                    <p><strong>Phone Number:</strong> {{ volunteer.phone_number }}</p>
+                    <p><strong>Education Level:</strong> {{ volunteer.get_education_level_display }}</p>
+                    <p><strong>Education Year:</strong> {{ volunteer.education_year }}</p>
+                    <p><strong>Department:</strong> {{ volunteer.department }}</p>
+                </div>
 
-            <div class="col-md-6">
-                <p><strong>Is Member:</strong> {% if volunteer.is_member %}Yes{% else %}No{% endif %}</p>
-                <p><strong>Is Active Member:</strong> {% if volunteer.is_active_member %}Yes{% else %}No{% endif %}</p>
-                <p><strong>Adherence Date:</strong> {{ volunteer.adherence_date }}</p>
-                <p><strong>Last Active Date:</strong> {{ volunteer.last_active_date }}</p>
-                <p class="mt-2"><strong>Total Hours:</strong> {{ total_hours }} hours</p>
+                <div class="col-md-6">
+                    <p><strong>Is Member:</strong> {% if volunteer.is_member %}Yes{% else %}No{% endif %}</p>
+                    <p><strong>Is Active Member:</strong> {% if volunteer.is_active_member %}Yes{% else %}No{% endif %}
+                    </p>
+                    <p><strong>Adherence Date:</strong> {{ volunteer.adherence_date }}</p>
+                    <p><strong>Last Active Date:</strong> {{ volunteer.last_active_date }}</p>
+                    <p class="mt-2"><strong>Total Hours:</strong> {{ total_hours }} hours</p>
+                </div>
             </div>
         </div>
-    </div>
 
 
-    <h2>Participations</h2>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Event</th>
-            <th>Date</th>
-            <th>Notes</th>
-            <th>Worked Hours</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for participation in participations %}
+        <h2>Participations</h2>
+        <table class="table table-striped" id="participationsTable">
+            <thead>
             <tr>
-                <td>
-                    <a href="{% url 'view_event' event_id=participation.event.id %}">
-                        {{ participation.event.name }}
-                    </a>
-                </td>
-
-
-                <td>
-                    {% if participation.event.start_date != participation.event.end_date %}
-                        {{ participation.event.start_date }} - {{ participation.event.end_date }}
-                    {% else %}
-                        {{ participation.event.start_date }}
-                    {% endif %}
-                </td>
-
-                <td>{{ participation.notes }}</td>
-                <td>{{ participation.worked_hours }} hours</td>
-                <td>
-                    <form method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="delete_participation" value="{{ participation.id }}">
-                        <button type="submit" name="delete_participation_button" class="btn btn-danger btn-sm">Delete
-                        </button>
-                    </form>
-                </td>
+                <th>Event</th>
+                <th>Date</th>
+                <th>Notes</th>
+                <th>Worked Hours</th>
+                <th>Actions</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for participation in participations %}
+                <tr>
+                    <td>
+                        <a href="{% url 'view_event' event_id=participation.event.id %}">
+                            {{ participation.event.name }}
+                        </a>
+                    </td>
 
 
-    <div class="container mt-3">
-        <div class="row justify-content-center">
-            <div class="col-auto">
-                <a href="{% url 'edit_volunteer' user_id=volunteer.id %}" class="btn btn-primary">Edit Volunteer</a>
-            </div>
-            <div class="col-auto">
-                <form method="post">
-                    {% csrf_token %}
-                    <button type="submit" name="delete" class="btn btn-danger">Delete Volunteer</button>
-                </form>
-            </div>
-            <div class="col-auto">
-                <a href="{% url 'generate_report' volunteer.id %}" class="btn btn-primary"> Generate PDF report</a>
-            </div>
-            <div class="col-auto">
-                <a href="{% url 'volunteers_list' %}" class="btn btn-secondary">Back</a>
+                    <td>
+                        {% if participation.event.start_date != participation.event.end_date %}
+                            {{ participation.event.start_date }} - {{ participation.event.end_date }}
+                        {% else %}
+                            {{ participation.event.start_date }}
+                        {% endif %}
+                    </td>
+
+                    <td>{{ participation.notes }}</td>
+                    <td>{{ participation.worked_hours }} hours</td>
+                    <td>
+                        <div class="row justify-content-center">
+                            <div class="col-auto">
+                                <a href="{% url 'edit_participation' participation_id=participation.id %}"
+                                   class="btn btn-primary">Edit</a>
+                            </div>
+                            <div class="col-auto">
+                            <form method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="delete_participation" value="{{ participation.id }}">
+                                <button type="submit" name="delete_participation_button" class="btn btn-danger">
+                                    Delete
+                                </button>
+                            </form>
+                            </div>
+                        </div>
+                    </td>
+
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+        <div class="container mt-3">
+            <div class="row justify-content-center">
+                <div class="col-auto">
+                    <a href="{% url 'edit_volunteer' user_id=volunteer.id %}" class="btn btn-primary">Edit Volunteer</a>
+                </div>
+                <div class="col-auto">
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" name="delete" class="btn btn-danger">Delete Volunteer</button>
+                    </form>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'generate_report' volunteer.id %}" class="btn btn-primary"> Generate PDF report</a>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'volunteers_list' %}" class="btn btn-secondary">Back</a>
+                </div>
             </div>
         </div>
+
     </div>
-
-
-
+    <script>
+        $(document).ready(function () {
+            var table = $('#participationsTable').DataTable({
+                "paging": true,
+                "ordering": true,
+                "info": true,
+                "searching": true,
+            });
+        });
+    </script>
 {% endblock %}

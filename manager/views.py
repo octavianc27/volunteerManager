@@ -60,6 +60,7 @@ def view_volunteer(request, user_id):
         participation_id = request.POST.get('delete_participation')
         if participation_id:
             participation = get_object_or_404(Participation, pk=participation_id)
+            participation.volunteer.update_last_active_date()
             participation.delete()
             return redirect('view_volunteer', user_id=user_id)
 
@@ -80,6 +81,15 @@ def events_list(request):
 @login_required
 def view_event(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
+
+    if request.method == 'POST' and 'delete_participation' in request.POST:
+        participation_id = request.POST.get('delete_participation')
+        if participation_id:
+            participation = get_object_or_404(Participation, pk=participation_id)
+            participation.volunteer.update_last_active_date()
+            participation.delete()
+            return redirect('view_event', event_id=event_id)
+
     participations = Participation.objects.filter(event=event)
     total_hours = participations.aggregate(Sum('worked_hours'))['worked_hours__sum'] or 0
 
@@ -344,7 +354,7 @@ def view_dashboard(request):
     plt.bar(years, counts, color='skyblue')
     plt.xlabel('Year')
     plt.ylabel('Number of Adherences')
-    plt.title('Number of Adherences per Year', fontsize = 18)
+    plt.title('Number of Adherences per Year', fontsize=18)
     plt.xticks(years)
     plt.grid(axis='y', linestyle='--', alpha=0.7)
 
