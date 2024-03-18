@@ -52,6 +52,10 @@ class VolunteerEditForm(forms.ModelForm):
         model = Volunteer
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['adherence_date'].widget.attrs['class'] = 'datepicker'
+
 
 class ParticipationEditForm(forms.ModelForm):
     class Meta:
