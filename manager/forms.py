@@ -51,3 +51,9 @@ class VolunteerEditForm(forms.ModelForm):
     class Meta:
         model = Volunteer
         fields = '__all__'
+
+
+class ParticipationEditForm(forms.ModelForm):
+    class Meta:
+        model = Participation
+        fields = '__all__'

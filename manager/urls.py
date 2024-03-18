@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 from .views import add_volunteer, view_volunteer, events_list, view_event, add_event, delete_event, add_participation, \
-    edit_volunteer, edit_event, generate_report, view_dashboard, volunteers_list
+    edit_volunteer, edit_event, generate_report, view_dashboard, volunteers_list, edit_participation
 
 urlpatterns = [
     path("", view_dashboard, name="index"),
@@ -19,6 +19,7 @@ urlpatterns = [
     path('events/<int:event_id>/edit/', edit_event, name='edit_event'),
 
     path('add_participation/', add_participation, name='add_participation'),
+    path('participartions/<int:participation_id>/edit/', edit_participation, name='edit_participation'),
 
     path('generate_report/<int:user_id>/', generate_report, name='generate_report'),
 ]

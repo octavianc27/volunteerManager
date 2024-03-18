@@ -13,7 +13,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from reportlab.lib.pagesizes import letter
 
-from .forms import VolunteerForm, EventForm, ParticipationForm, VolunteerEditForm
+from .forms import VolunteerForm, EventForm, ParticipationForm, VolunteerEditForm, ParticipationEditForm
 from .models import Volunteer, Event, Participation
 
 from reportlab.pdfgen import canvas
@@ -145,6 +145,21 @@ def edit_volunteer(request, user_id):
         form = VolunteerEditForm(instance=volunteer)
 
     return render(request, 'edit_volunteer.html', {'form': form, 'volunteer': volunteer})
+
+
+@login_required
+def edit_participation(request, participation_id):
+    participation = get_object_or_404(Participation, pk=participation_id)
+
+    if request.method == 'POST':
+        form = ParticipationEditForm(request.POST, instance=participation)
+        if form.is_valid():
+            form.save()
+            return redirect('view_event', event_id=participation.event.id)
+    else:
+        form = ParticipationEditForm(instance=participation)
+
+    return render(request, 'edit_participation.html', {'form': form, 'participation': participation})
 
 
 @login_required
