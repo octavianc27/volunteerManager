@@ -275,7 +275,7 @@ def view_dashboard(request):
 
     # Generate a bar chart image and convert it to base64 for rendering in the template
     plt.figure(figsize=(8, 5))
-    plt.bar(month_names, monthly_totals)
+    plt.bar(month_names, monthly_totals, color="skyblue")
     plt.xlabel('Month', fontsize=14)
     plt.ylabel('Total Hours', fontsize=14)
     plt.title('Volunteering Hours per Month in the Last Year', fontsize=16)
@@ -311,6 +311,33 @@ def view_dashboard(request):
 
     department_chart_base64 = base64.b64encode(department_chart_stream.getvalue()).decode('utf-8')
 
+    # Get the adherence years of all volunteers and create a plot
+    adherence_dates = Volunteer.objects.filter(is_member=True).values('adherence_date')
+    # Extract year from adherence dates and count occurrences
+
+    year_counts = Counter([date["adherence_date"].year for date in adherence_dates])
+    print(year_counts)
+    # Sort the counts by year
+    year_counts = dict(sorted(year_counts.items()))
+
+    # Plotting the data
+    years = list(year_counts.keys())
+    counts = list(year_counts.values())
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(years, counts, color='skyblue')
+    plt.xlabel('Year')
+    plt.ylabel('Number of Adherences')
+    plt.title('Number of Adherences per Year')
+    plt.xticks(years)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+    adherences_chart_stream = BytesIO()
+    plt.savefig(adherences_chart_stream, format='png')
+    plt.close()
+
+    adherences_chart_base64 = base64.b64encode(adherences_chart_stream.getvalue()).decode('utf-8')
+
     # Prepare the context with relevant data for rendering in the template
     context = {
         'num_volunteers': num_volunteers,
@@ -319,6 +346,7 @@ def view_dashboard(request):
         'upcoming_events': upcoming_events,
         'chart_image': image_base64,
         'department_chart_image': department_chart_base64,
+        'adherences_chart_image': adherences_chart_base64,
         'events_calendar': events_data
     }
 

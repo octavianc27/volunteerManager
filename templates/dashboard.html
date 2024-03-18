@@ -63,23 +63,39 @@
 
             <hr class="my-4"> <!-- Horizontal line -->
 
-            <h3 class="mt-2 mb-4">Statistics</h3>
+            <div class="statistics">
+                <h3 class="mt-2 mb-4">Statistics</h3>
 
-            <div class="col-md-6">
-                {% if chart_image %}
-                    <div class="card">
-                        <img src="data:image/png;base64,{{ chart_image }}" alt="Worked Hours per Month">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if chart_image %}
+                            <div class="card">
+                                <img src="data:image/png;base64,{{ chart_image }}" alt="Worked Hours per Month">
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
+
+                    <div class="col-md-6">
+                        {% if chart_image %}
+                            <div class="card">
+                                <img src="data:image/png;base64,{{ adherences_chart_image }}" alt="Adherences Per Year">
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        {% if department_chart_image %}
+                            <div class="card">
+                                <img src="data:image/png;base64,{{ department_chart_image }}"
+                                     alt="Worked Hours per Month">
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
 
-            <div class="col-md-6">
-                {% if department_chart_image %}
-                    <div class="card">
-                        <img src="data:image/png;base64,{{ department_chart_image }}" alt="Worked Hours per Month">
-                    </div>
-                {% endif %}
-            </div>
         </div>
 
 
@@ -105,7 +121,7 @@
             });
 
 
-        calendar.render();
+            calendar.render();
         })
         ;
 
