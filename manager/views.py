@@ -294,6 +294,7 @@ def view_dashboard(request):
     plt.xlabel('Month', fontsize=14)
     plt.ylabel('Total Hours', fontsize=14)
     plt.title('Volunteering Hours per Month in the Last Year', fontsize=16)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
     image_stream = BytesIO()
     plt.savefig(image_stream, format='png')
     plt.close()
@@ -343,7 +344,7 @@ def view_dashboard(request):
     plt.bar(years, counts, color='skyblue')
     plt.xlabel('Year')
     plt.ylabel('Number of Adherences')
-    plt.title('Number of Adherences per Year')
+    plt.title('Number of Adherences per Year', fontsize = 18)
     plt.xticks(years)
     plt.grid(axis='y', linestyle='--', alpha=0.7)
 

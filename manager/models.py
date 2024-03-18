@@ -7,7 +7,7 @@ from django.db import models
 class Volunteer(models.Model):
     first_name = models.CharField(max_length=25)
     last_name = models.CharField(max_length=25)
-    email = models.EmailField()
+    email = models.EmailField(blank=True)
     phone_number = models.CharField(max_length=15, blank=True)
 
     is_member = models.BooleanField(default=True)
@@ -70,6 +70,7 @@ class Event(models.Model):
     description = models.TextField()
     start_date = models.DateField(default=datetime.today)
     end_date = models.DateField(default=datetime.today)
+    done_reporting = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.name}'
